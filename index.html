@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ár Rincí Céilí — Concise Set</title>
+<style>
+  @font-face {
+    font-family: 'Georgia-fallback';
+    src: local('Georgia');
+  }
+
+  :root{
+    --green-deep: #1F3D2E;
+    --green-mid: #2C5240;
+    --parchment: #F1E9D8;
+    --parchment-dark: #E6DAC0;
+    --brass: #B8863C;
+    --brass-light: #D4A85E;
+    --rust: #8B3A2B;
+    --ink: #2A241C;
+    --ink-soft: #55483A;
+    --line: rgba(42,36,28,0.16);
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% -10%, #2d5a41 0%, transparent 55%),
+      radial-gradient(ellipse at 90% 110%, #17301f 0%, transparent 50%),
+      var(--green-deep);
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sans{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+
+  .wrap{
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 28px 18px 56px;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    text-align:center;
+    margin-bottom: 32px;
+    color: var(--parchment);
+  }
+  header .eyebrow-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom: 6px;
+  }
+  header .eyebrow-row .rule{
+    height:1px;
+    width:34px;
+    background: var(--brass-light);
+    opacity:.6;
+  }
+  header .eyebrow{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--brass-light);
+    font-weight:600;
+  }
+  header h1{
+    font-size: clamp(26px, 6vw, 34px);
+    margin: 2px 0 2px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  header .subtitle{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 13.5px;
+    color: #C9D8CC;
+    margin: 0;
+  }
+
+  /* ---------- Card stage ---------- */
+  .stage{
+    position:relative;
+    flex: 1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    perspective: 1800px;
+    min-height: 480px;
+  }
+
+  .card{
+    width:100%;
+    max-width: 500px;
+    aspect-ratio: 5/7;
+    position:relative;
+    transform-style:preserve-3d;
+    transition: transform 0.55s cubic-bezier(.3,.1,.2,1);
+    cursor:pointer;
+  }
+  .card.flipped{ transform: rotateY(180deg); }
+
+  .face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius: 6px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.45), 0 2px 0 rgba(255,255,255,0.4) inset;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    background: var(--parchment);
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .face::before{
+    /* paper texture via subtle noise-like gradient */
+    content:"";
+    position:absolute; inset:0;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, transparent 1px, transparent 2px),
+      radial-gradient(ellipse at top left, rgba(255,255,255,0.5), transparent 60%);
+    pointer-events:none;
+  }
+  .face .spine{
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width: 14px;
+    background: linear-gradient(90deg, var(--brass) 0%, var(--brass-light) 40%, transparent 100%);
+    opacity:0.85;
+  }
+
+  .back{ transform: rotateY(180deg); }
+
+  /* ---- Front face content ---- */
+  .front-inner{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 34px 30px;
+    position:relative;
+  }
+  .card-number{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size:11px;
+    letter-spacing:0.16em;
+    color: var(--brass);
+    font-weight:700;
+    margin-bottom: 18px;
+  }
+  .irish-name{
+    font-size: clamp(24px, 6.4vw, 32px);
+    font-style: italic;
+    color: var(--ink);
+    line-height:1.18;
+    margin: 0 0 10px;
+  }
+  .divider-flourish{
+    width: 46px;
+    height: 1px;
+    background: var(--rust);
+    margin: 12px auto;
+    position:relative;
+  }
+  .divider-flourish::before, .divider-flourish::after{
+    content:"";
+    position:absolute;
+    top:-2.5px;
+    width:5px; height:5px;
+    border-radius:50%;
+    background: var(--rust);
+  }
+  .divider-flourish::before{ left:-8px; }
+  .divider-flourish::after{ right:-8px; }
+  .english-name{
+    font-size: clamp(17px, 4.2vw, 21px);
+    color: var(--ink-soft);
+    font-weight:400;
+    margin: 0;
+  }
+  .tap-hint{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    position:absolute;
+    bottom: 22px;
+    left:0; right:0;
+    text-align:center;
+    font-size: 11px;
+    letter-spacing:0.08em;
+    color: var(--ink-soft);
+    opacity: 0.55;
+  }
+
+  /* ---- Back face content ---- */
+  .back-inner{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding: 22px 22px 16px 30px;
+    overflow-y:auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .back-header{
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .back-header .en{
+    font-family: Georgia, serif;
+    font-size: 19px;
+    color: var(--ink);
+    margin: 0 0 1px;
+  }
+  .back-header .ir{
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin:0;
+  }
+
+  .meta-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+    margin-bottom: 14px;
+  }
+  .meta-item{
+    background: rgba(255,255,255,0.4);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 7px 9px;
+  }
+  .meta-item .k{
+    font-size: 9.5px;
+    letter-spacing: 0.09em;
+    color: var(--rust);
+    font-weight:700;
+    display:block;
+    margin-bottom:2px;
+  }
+  .meta-item .v{
+    font-size: 12px;
+    color: var(--ink);
+    line-height:1.35;
+  }
+  .meta-item.full{ grid-column: 1 / -1; }
+
+  .movements-label{
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--brass);
+    font-weight:700;
+    margin: 4px 0 8px;
+  }
+
+  .movement{
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .movement:last-child{ border-bottom:none; }
+  .movement-concise{ padding: 6px 0; }
+  .movement-concise .movement-head{ margin-bottom:0; }
+  .movement-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+  .movement-title{
+    font-size: 12.5px;
+    font-weight:700;
+    color: var(--ink);
+  }
+  .movement-title .ir{
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink-soft);
+    font-size: 11.5px;
+  }
+  .movement-bars{
+    font-size: 10.5px;
+    color: var(--parchment);
+    background: var(--green-mid);
+    padding: 1px 7px;
+    border-radius: 999px;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .movement-desc{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height:1.45;
+  }
+
+  .total-bars{
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 11.5px;
+    color: var(--ink);
+    font-weight:600;
+  }
+  .total-bars span{
+    font-weight:400;
+    color:var(--ink-soft);
+  }
+
+  .notes{
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-style: italic;
+    line-height:1.4;
+  }
+
+  /* scrollbar styling for back */
+  .back-inner::-webkit-scrollbar{ width:6px; }
+  .back-inner::-webkit-scrollbar-thumb{ background: var(--brass); border-radius:3px; }
+  .back-inner::-webkit-scrollbar-track{ background: transparent; }
+
+  /* ---------- Nav ---------- */
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 18px;
+    margin-top: 22px;
+  }
+  .nav-btn{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    width:44px; height:44px;
+    border-radius:50%;
+    border: 1px solid rgba(241,233,216,0.3);
+    background: rgba(241,233,216,0.08);
+    color: var(--parchment);
+    font-size:18px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .nav-btn:hover{ background: rgba(241,233,216,0.18); }
+  .nav-btn:active{ transform: scale(0.94); }
+  .nav-btn:disabled{ opacity:0.3; cursor:default; }
+
+  .counter{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--parchment);
+    font-size: 13px;
+    min-width: 90px;
+    text-align:center;
+  }
+  .counter .cur{ color: var(--brass-light); font-weight:700; }
+
+  .shuffle-btn{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background:none;
+    border: 1px solid rgba(241,233,216,0.3);
+    color: var(--parchment);
+    font-size:12px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor:pointer;
+    margin-top: 14px;
+    align-self:center;
+    transition: background .15s ease;
+  }
+  .shuffle-btn:hover{ background: rgba(241,233,216,0.12); }
+
+  @media (max-width: 420px){
+    .meta-grid{ grid-template-columns: 1fr; }
+    .stage{ min-height: 440px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow-row">
+      <div class="rule"></div>
+      <div class="eyebrow sans">AN COIMISIÚN LE RINCÍ GAELACHA</div>
+      <div class="rule"></div>
+    </div>
+    <h1>Ár Rincí Céilí</h1>
+    <p class="subtitle">Concise Set</p>
+  </header>
+
+  <div class="stage">
+    <div class="card" id="card">
+      <div class="face front">
+        <div class="spine"></div>
+        <div class="front-inner">
+          <div class="card-number" id="cardNum">DANCE No. 1</div>
+          <div class="irish-name" id="irishName">Ballaí Luimní</div>
+          <div class="divider-flourish"></div>
+          <div class="english-name" id="englishName">Walls of Limerick</div>
+          <div class="tap-hint sans">TAP TO REVEAL MOVEMENTS</div>
+        </div>
+      </div>
+      <div class="face back">
+        <div class="spine"></div>
+        <div class="back-inner" id="backContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn" id="prevBtn" aria-label="Previous">&#8592;</button>
+    <div class="counter sans"><span class="cur" id="curIdx">1</span> / <span id="totIdx">30</span></div>
+    <button class="nav-btn" id="nextBtn" aria-label="Next">&#8594;</button>
+  </div>
+
+  <button class="shuffle-btn" id="shuffleBtn">Shuffle deck</button>
+
+</div>
+
+<script>const DANCES = [{"num": 1, "irish": "Ballaí Luimní", "english": "Walls of Limerick", "type": "Progressive", "time": "Reel time (2/4)", "dancers": "Any number of couples (sets of 2 couples facing)", "formation": "Two lines, couples facing each other; gent on lady's left, lady's left hand in gent's right", "movements": [["1. Advance and Retire", "Ar Aghaidh is ar gCúl", "Couples advance towards each other (2), retire (2), repeat (4)", "8 bars"], ["2. Half Right and Left", "Trasna Leath-thaobh", "Ladies sidestep & exchange places (4 - two threes); gents sidestep & exchange (4)", "8 bars"], ["3. Dance with Opposite", "Fir is Mná Thall", "Gents sidestep with opposite lady's right hand (4), sidestep back (4)", "8 bars"], ["4. Swing Around", "Luascadh Timpeall", "Couples swing around each other anti-clockwise, revolve to new position", "8 bars"]], "totalBars": 32, "notes": "Simplest of all céilí dances. Leading couple stands idle each time it reaches the end of the line.", "isHandDance": false}, {"num": 2, "irish": "Cor Aontroma", "english": "Antrim Reel", "type": "Progressive", "time": "Reel time (2/4)", "dancers": "Any number of couples (sets of 2 couples)", "formation": "Two lines, couples facing; gent's left hand under lady's right", "movements": [["1. Advance and Return", "Ar Aghaidh is Filleadh", "Advance & retire, repeat", "8 bars"], ["2. Right and Left Half Turn", "Leathchasadh Deasóige is Ciotóige", "Half turn right hand, half turn left hand", "8 bars"], ["3. Sidestep and Heyes", "Leaththaobh agus Athrú Áiteanna", "Sidestep and change places", "8 bars"], ["4. Down the Centre", "Síos i Lár Baill", "Top couple sidestep down centre and back", "8 bars"], ["5. Right Hands Across", "Deasóga is Ciotóga Trasna", "Right hands across, then left hands across back", "8 bars"], ["6. Sidestep with Opposite", "Anonn le Chéile", "Sidestep across with opposite dancer", "8 bars"], ["7. Left and Right Hands Across", "Ciotóga agus Deasóga Trasna", "Left hands across first, then right", "8 bars"], ["8. Swing Around", "Luascadh Timpeall", "Swing around to exchange places with opposite couple", "8 bars"]], "totalBars": 64, "notes": "Same progression logic as Walls of Limerick.", "isHandDance": false}, {"num": 3, "irish": "Briseadh na Carraige", "english": "Siege of Carrick", "type": "Progressive (couples; originally danced as a 4-hand)", "time": "Jig time (6/8) — danced to \"Haste to the Wedding\"", "dancers": "Any number of couples (sets of 2 couples)", "formation": "Same as Walls of Limerick", "movements": [["1. Ring", "Céim an Fháinne", "Ring of 4 sidestep clockwise (4), anti-clockwise & release (4)", "8 bars"], ["2. Right & Left Hands Across", "Deasóga is Ciotóga Trasna", "Right hands across clockwise (4), left hands across anti-clockwise (4)", "8 bars"], ["3. Down Centre and Turn", "Síos i Lár Baill agus Casadh", "Top/bottom exchange (2), retire (2), clap twice (1), link right arm & turn (3)", "8 bars"], ["4. Up Centre and Swing", "Suas i Lár Baill agus Luascadh", "Bottom/top exchange (2), retire (2), clap twice (1), link right arm & swing to new couple (3)", "8 bars"]], "totalBars": 32, "notes": "Each part of the tune played twice so the claps in movements 3 & 4 land correctly. Progression as in Walls of Limerick.", "isHandDance": false}, {"num": 4, "irish": "Réicí Mhala", "english": "Rakes of Mallow", "type": "Progressive (trios)", "time": "Reel time (2/4) — no sidestep in this dance", "dancers": "Any number of trios (gent with 2 ladies on his right)", "formation": "Unusual formation: lines of trios facing each other (OOX / XOO)", "movements": [["1. Advance and Retire", "Ar Aghaidh is ar gCúl", "Lines of 3 advance (2), retire (2), repeat (4)", "8 bars"], ["2. Swing with Opposite Lady", "Luascadh le Cailín Thall", "Gent swings opposite lady; centre lady stationary", "8 bars"], ["3. Swing with Lady on Right", "Luascadh le Cailín ar Dheis", "Gent swings lady on his right; outer lady stationary", "8 bars"], ["4. Link Arms in Centre", "Uillinn in Uillinn", "Two gents link right arm & turn (4), left arm & turn back between ladies (4)", "8 bars"], ["5. Swing Around", "Luascadh Timpeall", "Trios form ring, swing around anti-clockwise to exchange with next trio", "8 bars"]], "totalBars": 40, "notes": "Composed by Fr. Lorcan Ó Muireadhaigh for a céilí where girls outnumbered boys.", "isHandDance": false}, {"num": 5, "irish": "Port an Fhómhair", "english": "Harvest Time Jig", "type": "Progressive (trios)", "time": "Jig time (6/8)", "dancers": "Any number of trios in a line, gent between two ladies", "formation": "Lines of OXO facing another line of OXO", "movements": [["1. Advance and Retire", "Ar Aghaidh is ar gCúl", "Lines of 3 advance (2), retire (2), repeat (4)", "8 bars"], ["2. Sides", "Na Cliatháin", "Sidestep right, finish with rising step (4); sidestep back (4)", "8 bars"], ["3. Right and Left Hands Across", "Deasóga agus Ciotóga Trasna", "Sets of 6 give right hands across, dance clockwise (4); left hands across back (4)", "8 bars"], ["4. Sides (left first)", "Na Cliatháin", "As movement 2, sidestep left first", "8 bars"], ["5. Left and Right Hands Across", "Ciotóga agus Deasóga Trasna", "As movement 3, left hands first", "8 bars"], ["6. Step and Turn", "Céim is Cas Timpeall", "Gent faces lady right, sink-and-grind step twice (4), full turn with right hand (4); repeat facing lady left (8)", "16 bars"], ["7. Advance, Retire & Pass Through", "Ar Aghaidh, ar gCúl agus Tríd", "Trios advance/retire (4); pass through opposite line, right shoulder to right (4)", "8 bars"]], "totalBars": 72, "notes": "Repeat with each successive set.", "isHandDance": false}, {"num": 6, "irish": "Ionsaí na hInse", "english": "Siege of Ennis", "type": "Progressive", "time": "Jig time (6/8)", "dancers": "Any number, sets of 2 couples in a line facing another set of 2 couples", "formation": "Lines of 4 (OXOX) facing another line of 4 (XOXO)", "movements": [["1. Advance and Retire", "Ar Aghaidh is ar gCúl", "Lines of 4 advance (2), retire (2), repeat (4)", "8 bars"], ["2. Sides", "Na Cliatháin", "Couples change places with sidestep, finish rising step (4); back (4)", "8 bars"], ["3. Right & Left Hands Across", "Deasóga is Ciótóga Trasna", "Outside gents take opposite lady's hand, all turn clockwise (4); reverse, left hands, anti-clockwise (4)", "8 bars"], ["4. Advance, Retire and Pass Through", "Ar Aghaidh, ar gCúl agus Tríd", "Advance/retire (4); form arch, opposite line passes under, right shoulder to right (4)", "8 bars"]], "totalBars": 32, "notes": "A hugely popular beginner céilí dance.", "isHandDance": false}, {"num": 7, "irish": "Baint an Fhéir", "english": "Haymakers Jig", "type": "Long dance", "time": "Jig time (6/8) — no sidestep", "dancers": "Five couples, gents in one line, ladies in the other, facing", "formation": "Line of 5 gents facing line of 5 ladies (numbered 1–5)", "movements": [["1. Advance and Retire", "Ar Aghaidh is ar gCúl", "Advance/retire (4), repeat (4); Rise and Grind step right & left (4); advance/retire (4)", "16 bars"], ["2. Turn in Centre", "Casadh i Lár Baill", "No.1 & Lady 5 turn right hand in centre (4); No.5 & Lady 1 repeat (4); repeat both with left hand (8)", "16 bars"], ["3. Swing in Centre", "Luascadh i Lár Baill", "No.1 & Lady 5 swing crossed hands (6), release, return (2); No.5 & Lady 1 repeat (8)", "16 bars"], ["4. Link Arms", "Uillinn in Uillinn", "No.1 couple link right/left arm progressively down the whole line, then swing back to place", "(no fixed bar count given)"], ["5. Cast Off", "Síos ar ghach taobh", "No.1 couple cast off, march to bottom followed by line, form arch; all pass under to progress up one place", "(no bars given)"]], "totalBars": 48, "notes": "Dance repeats until every couple has led as Couple No.1.", "isHandDance": false}, {"num": 8, "irish": "Droichead Átha Luain", "english": "Bridge of Athlone", "type": "Progressive", "time": "Jig & March time (movements 1–2 jig, 3–4 march)", "dancers": "Any number of couples", "formation": "Two lines, gents' left shoulder to top of room, partners facing", "movements": [["1. Rising Step, Advance and Retire", "An tArdú ar Aghaidh is ar gCúl", "Rise & Grind (4), advance/retire (4), Rise & Grind (4), pass through to opposite line & turn (4); repeat back (16)", "32 bars"], ["2. Down the Centre", "Síos i Lár Baill", "Leading couple(s) sidestep down centre between stationary lines (4), sidestep back (4)", "8 bars"], ["3. Cast Off (march)", "Síos ar Ghach Taobh", "Couple 1 cast off, march to bottom of own line, gents left / ladies right", "No bars"], ["4. The Bridge (march)", "An Droichead", "Couples form an arch (\"bridge\"); leading couple march through with others progressing under it to new places", "No bars"]], "totalBars": 40, "notes": "Repeated until the music ceases.", "isHandDance": false}, {"num": 9, "irish": "Tonnaí Thóraigh", "english": "Waves of Tory", "type": "Progressive", "time": "Reel & march time (1–4 reel, 5–7 march) — no sidestep", "dancers": "Any number of couples, in sets of four", "formation": "Two lines, gents' left shoulder to top of room, partners facing", "movements": [["1. Advance and Retire", "Ar Aghaidh is ar gCúl", "Advance (2), retire (2), repeat (4)", "8 bars"], ["2. Right & Left Hands Across", "Deasóga is Ciotóga Trasna", "Sets of four, right hands across clockwise (4); left hands across anti-clockwise (4)", "8 bars"], ["3. Advance and Retire (repeat)", "Ar Aghaidh is ar gCúl", "As movement 1", "8 bars"], ["4. Left & Right Hands Across", "Ciotóga is Deasóga Trasna", "As movement 2 but left hands first", "8 bars"], ["5. Lead off Right & Up Centre (march)", "Thart ar Dheis agus Suas i Lár", "Couple 1 leads whole line to the bottom, then up the centre, back to place", "No bars"], ["6. The Waves (march)", "Na Tonnaí", "Couples form and pass under successive arches down and back up the hall (the 'waves')", "No bars"], ["7. Cast Off (march)", "Síos ar Ghach Taobh", "Couple 1 casts off, forms arch at bottom with couple 2, rest pass under to progress", "No bars"]], "totalBars": 32, "notes": "Represents the waves around Tory Island, Co. Donegal. Repeated until music ends.", "isHandDance": false}, {"num": 10, "irish": "Rince Fada", "english": "Long Dance", "type": "Progressive", "time": "Jig time (6/8) — no sidestep", "dancers": "Any number of couples, odd couples lead", "formation": "Two lines, gents' left shoulder to top of room, partners facing", "movements": [["1. Rising Step", "An tArdach", "Odd gent faces even lady & vice versa; Rise and Grind step right and left", "4 bars"], ["2. Right Wheel", "Deasóga Trasna", "Sets of 4 give right hands across, dance clockwise, release, back to place", "4 bars"], ["3. Rising Step (repeat)", "An tArdach", "Repeat movement 1, starting right foot", "4 bars"], ["4. Left Wheel", "Ciotóga Trasna", "Sets of 4 give left hands across, dance anti-clockwise, back to place", "4 bars"], ["5. Advance Down Centre", "Síos i Lár Baill", "Odd couples advance down centre between even couples (2), reverse (2), return (2), cast off to new position (2)", "8 bars"], ["6. Swing Around", "Luascadh Timpeall", "Odd couples now below new even couple, swing around each other anti-clockwise to full circle", "8 bars"]], "totalBars": 32, "notes": "Known only by its Gaelic title. As in Walls of Limerick's note on progression.", "isHandDance": false}, {"num": 11, "irish": "Deifir chun na Bainise", "english": "Haste to the Wedding", "type": "Progressive", "time": "Jig time (6/8) — danced to the tune of the same name", "dancers": "Any number of couples, even couples lead", "formation": "Two lines, gents' left shoulder to top of room, partners facing", "movements": [["1. Rising Step", "An tArdach", "Odd gent faces even (leading) lady & vice versa; Rise and Grind step right and left", "4 bars"], ["2. Right Wheel", "Deasóga Trasna", "Sets of 4 right hands across clockwise, release, back to place", "4 bars"], ["3. Rising Step (repeat)", "An tArdach", "Repeat movement 1, starting right foot", "4 bars"], ["4. Left Wheel", "Ciotóga Trasna", "Sets of 4 left hands across anti-clockwise, back to place", "4 bars"], ["5. Up the Centre", "Suas i lár Baill", "Even couple sidestep up centre with right hand (4); sidestep back, then take odd lady into a ring (4)", "8 bars"], ["6. First Ring", "An Chéad Fháinne", "Ring of 3 sidestep anti-clockwise (4); sidestep clockwise, arch to release lady, advance to odd gent (4)", "8 bars"], ["7. Second Ring", "An Dara Fáinne", "Even couple form ring with odd gent, sidestep clockwise (4); anti-clockwise, arch to release gent (4)", "8 bars"], ["8. Swing Around", "Luascadh Timpeall", "Odd/even couples swing around each other anti-clockwise to exchange places", "8 bars"]], "totalBars": 48, "notes": "Mirror-image progression of Rince Fada, with even couples leading.", "isHandDance": false}, {"num": 12, "irish": "Bainis Uí Lonagáin", "english": "Lannigan's Ball", "type": "Round dance", "time": "Single jig time — danced to the tune of the same name", "dancers": "Six couples in a circle (acceptable as 8-hand dance in competition)", "formation": "Couples stand in circle holding hands", "movements": [["1. Ring", "Céim an Fháinne", "Promenade clockwise (8), anti-clockwise back to place (8)", "16 bars"], ["2. Quarter's Hook", "Uillinn in Uillinn", "Link right arm with lady on left, turn (2); left arm with partner, turn (2); repeat (4)", "8 bars"], ["3. Rise and Grind Step", "Céim le Páirtí", "Rise and Grind right & left (4), throw-out hops (2), Rise and Grind (2), turn to partner (2); repeat facing partner (8)", "16 bars"], ["4. Lead Round in Centre", "Gabháil Timpeall i Lár", "Ladies promenade in small circle (3), turn (1), back to place taking gent's hand (4); gents repeat (8)", "16 bars"], ["5. Flirtation", "Spallaíocht", "Partners swing (2); gents advance to each successive lady around the ring, swinging each, ending facing partner with backs to centre", "16 bars"], ["6. Stack-up", "Carnáil", "Ladies promenade clockwise on outside while gents clap (6), turn (2); repeat with gents dancing, ladies clapping (8)", "16 bars"], ["7. Lead Around", "Gabháil Timpeall", "Promenade anti-clockwise back to place, forming circle", "8 bars"], ["8. Ring", "Céim an Fháinne", "Repeat movement 1 to complete the dance", "16 bars"]], "totalBars": 112, "notes": "Both ordinary and skip threes acceptable, but not mixed within the dance.", "isHandDance": false}, {"num": 13, "irish": "An Rince Mór", "english": "The Big Dance", "type": "Round dance", "time": "Reel time", "dancers": "Any number of couples", "formation": "Couples holding hands in a circle", "movements": [["1. Ring to Left and Right", "Leath Thaobh i bhFáinne", "Sidestep clockwise (4), anti-clockwise, release hands (4)", "8 bars"], ["2. Swing with Lady on Left", "Luascadh leis an Chailín eile", "Gents take crossed hands with lady on left, swing clockwise", "8 bars"], ["3. Swing with Partner", "Luascadh le Comhrinceoirí", "Gents take crossed hands with partner, swing clockwise", "8 bars"], ["4. Link Arms", "Uillinn in Uillinn", "Link right arm with lady on left, turn (2); left arm with partner, turn (2); repeat right (2); half turn into lead-around position (2)", "8 bars"], ["5. Lead Around", "Gabháil Timpeall", "Promenade anti-clockwise (6), form ring on last 2 bars", "8 bars"]], "totalBars": 40, "notes": "Traditionally used as the \"Last Dance\" at céilithe in the north of Ireland.", "isHandDance": false}, {"num": 14, "irish": "Rince Mór na Tine", "english": "Bonfire Dance", "type": "Round dance", "time": "Reel time", "dancers": "Any number of couples, preferably 6+", "formation": "Couples stand in circle holding hands", "movements": [["1. Advance and Retire", "Ar Aghaidh is ar gCúl", "Advance towards centre (4), retire (4)", "8 bars"], ["2. Ring", "Céim an Fháinne", "Sidestep anti-clockwise (4), clockwise (4)", "8 bars"], ["3. Advance and Retire (repeat)", "Ar Aghaidh is ar gCúl", "As movement 1", "8 bars"], ["4. Ring (repeat)", "Céim an Fháinne", "As movement 2, clockwise first; release hands to face partner", "8 bars"], ["5. Sidestep In and Out", "Isteach is Amach", "Sidestep right, ladies to centre / gents outward (2); sidestep back (2)", "4 bars"], ["6. Link Arms", "Uillinn in Uillinn", "Link right arm, turn clockwise to change places (2); left arm back (2)", "4 bars"], ["7. Sidestep In and Out (repeat)", "Isteach is Amach", "As movement 5, sidestep left first", "4 bars"], ["8. Link Arms (repeat)", "Uillinn in Uillinn", "As movement 6, left arms first; finish facing centre", "4 bars"], ["9. The Rose", "An Rós", "Ladies advance to form inner ring (4), sidestep out & in (4+4), turn with partner (4); gents repeat reverse order (16)", "32 bars"], ["10. Swing and Exchange Partners", "Luascadh agus Malartú", "Swing to exchange places (4); bow, turn to new partner, bow (4)", "8 bars"]], "totalBars": 88, "notes": "Traditionally danced around the bonfire on St. John's Eve. May be repeated with each dancer moving on to a new partner.", "isHandDance": false}, {"num": 15, "irish": "Cor Ceathrar", "english": "Four Hand Reel", "type": "Four-hand (Lead Around, Body, 2 Figures, Finish)", "time": "Reel time", "dancers": "Two couples (1 leading top, 1 opposite top)", "formation": "Two couples facing, Top of Room", "movements": [["Lead Around", "Gabháil Timpeall", "Both couples circle anti-clockwise (8), circle clockwise back (8)", "16 bars"], ["Body 1: The Square", "An Chearnóg", "Couples exchange places via sidestep (4+4), continue back to own place (8)", "16 bars"], ["Body 2: Four Sevens", "Ceithre Seachtanna", "Gents sidestep behind/ladies in front (2), back (2), repeat (4) — no two-threes", "8 bars"], ["Body 3: Right & Left Hands Across", "Deasóga agus Ciotóga Trasna", "Right hands across clockwise (4), left hands across anti-clockwise (4)", "8 bars"], ["Body 4: Down the Centre", "Síos i Lár Baill", "Couples exchange (2), half turn (2), sidestep back (2), half turn to place (2)", "8 bars"], ["Body 5: Right & Left Chain", "Slabhra na nDeas Lámh", "Gents clockwise, ladies anti-clockwise chain around circle back to place", "8 bars"], ["Figure 1: Figure of Eight & Ring of Three", "An Chéad Fhigiúr", "Top lady dances a figure-eight around opposite couple; ring & arch exchanges with each dancer; swing to place", "32 bars"], ["Figure 2: Ladies Chain", "An Dara Figiúr / Slabhra na mBan", "Ladies chain across, swing partners back to place", "16 bars"], ["Finish: Lead Around", "Gabháil Timpeall / An Deireadh", "As at start of dance", "16 bars"]], "totalBars": "128 bars (each Figure performed by both couples, Body repeated between)", "notes": "Opposite couple performs each Figure in turn (32/16 bars); the Body is danced again after each Figure performance.", "isHandDance": true}, {"num": 16, "irish": "Pléaracha na Bandan", "english": "Humours of Bandon", "type": "Four-hand (Lead Around, Body, 2 Figures)", "time": "Jig time — danced to the tune of the same name", "dancers": "Two couples", "formation": "As Four Hand Reel", "movements": [["Lead Around", "Gabháil Timpeall", "Circle anti-clockwise (8), circle clockwise back (8)", "16 bars"], ["Body 1: Sides", "Na Cliatháin", "Exchange places, gents behind, rising step (4); back, gents in front (4)", "8 bars"], ["Body 2: Half Right and Left", "Trasna Leath-Taobh", "Full turn crossed hands (4); change places passing outside (2); half turn to new position (2)", "8 bars"], ["Figure 1: Advance Through Centre", "An Chéad Fhigiúr / Idir An Bheirt Thall", "Top couple advance through & beyond opposite couple (4); exchange hand-turns with opposite dancers (2+2); return, repeat other side (2+2), full turn to place (4)", "16 bars"], ["Figure 2: Centre Meet", "An Dara Figiúr / Trasna i Lár Baill", "Top gent & opposite lady sidestep to swap places (2), rising step (2), full turn (4); sidestep back (2), rising step (2), full turn to place (4)", "16 bars"], ["Finish: Lead Around", "Gabháil Timpeall / An Deireadh", "As explained at start of dance", "16 bars"]], "totalBars": "Body always danced to 2nd part of tune (16 bars) between each figure performance", "notes": "Note: Figure 2 is performed twice — once led by top gent/opposite lady, once by top lady/opposite gent. Third Figure is Ladies Chain (16 bars).", "isHandDance": true}, {"num": 17, "irish": "Cor Gleann Cearr", "english": "Glencar Reel", "type": "Six-hand", "time": "Reel time", "dancers": "Three couples", "formation": "Gents in one line, ladies facing partner, gents' right shoulder to top of room", "movements": [["1. Advance and Retire", "Ar Aghaidh is ar gCúl", "Advance (2), retire (2), repeat (4)", "8 bars"], ["2. Ring", "Céim an Fháinne", "Sidestep clockwise (4), back & release (4)", "8 bars"], ["3. Sidestep Through", "Anonn Anall ar Leath-Taobh", "Sidestep through passing face to face (4); sidestep back (4)", "8 bars"], ["4. Figure of Eight", "Figiúr a hOcht", "Gents interlace among themselves; ladies interlace among themselves, weaving figure-eight pattern", "(unit with mvt 5)"], ["5. Double Figure of Eight", "Figiúr a hOcht i mBeirteanna", "Couples interlace figure-eight forward/backward, exchanging places around the set", "16 bars (mvts 4+5 combined)"], ["6. The Waves", "Na Tonnaí", "Couples form and pass under successive arches down the line", "(unit with mvt 7)"], ["7. Full Chain", "Slabhra Iomlán", "Gents anti-clockwise, ladies clockwise, grand chain back to original position", "16 bars (mvts 6+7 combined)"]], "totalBars": 56, "notes": "Movements 4 & 5 danced as one 16-bar unit; movements 6 & 7 also as one 16-bar unit.", "isHandDance": true}, {"num": 18, "irish": "Cor na Síog", "english": "The Fairy Reel", "type": "Six-hand (2 gents, 4 ladies) — can also be danced progressively", "time": "Reel time", "dancers": "2 gents & 4 ladies (trios: gent between two ladies)", "formation": "Two lines of trios (OXO / OXO)", "movements": [["1. Advance and Retire", "Ar Aghaidh is Ar gCúl", "Trios advance (2), retire (2), repeat, form ring on last 2 threes (4)", "8 bars"], ["2. Ring", "Céim an Fháinne", "Sidestep anti-clockwise (4), back & release into lines (4)", "8 bars"], ["3. Advance and Retire (repeat)", "Ar Aghaidh is ar gCúl", "As movement 1", "8 bars"], ["4. Ring (repeat)", "Céim an Fháinne", "As movement 2, clockwise first, finish in line facing partner", "8 bars"], ["5. Slip Sides", "Beirt ar Aghaidh", "Gent & lady sidestep towards opposite line (4); back, turn to other lady (4); repeat other direction (4+4)", "16 bars"], ["6. Gents Centre and Link Arms", "Buachaillí i Lár agus Uillinn in Uillinn", "Gents advance, link right arm & turn (4); left arm & turn to face lady (4); hand-turns with ladies left & right (8)", "16 bars"], ["7. The Square and Diamond", "An Chearnóg agus Muilleata", "Ladies trace a square pattern behind the gents; gents simultaneously trace a diamond", "16 bars"], ["8. Arches", "Na Stuanna", "Gents form arches alternately with each lady, who passes under (2+2), repeat first arch, back to line (4)", "8 bars"], ["9. Advance, Retire and Pass Through", "Ar Aghaidh, ar gCúl agus Tríd", "Trios advance/retire (4); pass through, right arm to right, to face new trio", "8 bars"]], "totalBars": 96, "notes": "Originally a fixed six-hand dance, but can also be danced progressively.", "isHandDance": true}, {"num": 19, "irish": "Cor an Diúic", "english": "The Duke Reel", "type": "Six-hand (Opening, Body, 2 Figures, Finish)", "time": "Reel time", "dancers": "Three couples", "formation": "Unusual formation — Couple 1 at bottom, Couples 2 & 3 at top sides", "movements": [["Opening: Ring", "Céim an Fháinne", "All hold hands, sidestep anti-clockwise (4), clockwise & release (4)", "8 bars"], ["Body 1: Sides", "Na Cliatháin", "Change places, gents behind (4), back gents in front (4); repeat with lady on left (4+4)", "16 bars"], ["Body 2: Link Arms", "Uillinn in Uillinn", "Link right arm, turn (2); left arm with lady on left, turn (2); repeat (4)", "8 bars"], ["Body 3: Interlace", "Idirfí", "Gents anti-clockwise, ladies clockwise, chain movement without hands, alternating shoulders", "8 bars"], ["Body 4: Advance and Retire", "Ar Aghaidh is ar gCúl", "Ring advances (2), retires (2), advances again (2), retires (2)", "8 bars"], ["Figure 1: Figure of Eight", "An Chéad Figiúr / Figiúr a hOcht", "Couple 1 dances a figure-eight around Couple 2, forms ring, sidestep clockwise (4), swing back to place (4)", "16 bars"], ["Figure 2: Right and Left Chain", "An Dara Figiúr / Slabhra na nDeas Lámh", "Gents clockwise, ladies anti-clockwise chain (8); swing around to place (8)", "16 bars"], ["Finish: Swing Around", "An Deireadh / Luascadh Timpeall", "Partners swing around in couples, anti-clockwise", "8 bars"]], "totalBars": "Figures performed successively by Couples 1&2, 2&3, 3&1, with the Body repeated between each", "notes": "Note the unusual formation for this dance.", "isHandDance": true}, {"num": 20, "irish": "Cor Ochtar", "english": "Eight Hand Reel", "type": "Eight-hand (Lead Around, Body, 2 Figures, Finish)", "time": "Reel time", "dancers": "Four couples", "formation": "Tops (1,2) and Sides (3,4); 1&4 and 2&3 contrary to each other", "movements": [["Lead Around", "Gabháil Timpeall", "All couples circle anti-clockwise (8), circle clockwise back (8)", "16 bars"], ["Body 1: Extended Sides", "Na Cliatháin", "Exchange places (4), continue same direction (4), hand-turn & chain back (2+6)", "16 bars"], ["Body 2: Skip Across", "Scinneadh Trasna", "Tops exchange (4), sides exchange (4), gents hand-turn progressively around set (4+4), reverse (8+4+4)", "32 bars"], ["Body 3: Return Chain", "Slabhra Fillte", "Gents anti-clockwise, ladies clockwise, chain to opposite side & half turn (8); chain back to place (8)", "16 bars"], ["Body 4: Back to Back", "Cúl le Cúl", "Sidestep to contrary partner (2), form back-to-back ring (2), turn with contrary lady (2), return to partner (2); swing with couple on left (8)", "16 bars"], ["Figure 1: Advance and Retire", "An Chéad Fhigiúr", "Tops advance/retire (4), swing around each other (8)", "16 bars"], ["Figure 2: Ladies Chain", "An Dara Figiúr / Slabhra na mBan", "Ladies chain across & back (8), swing to place (8)", "16 bars"], ["Finish", "An Deireadh", "Ring advance/retire (8), sidestep both ways (8+8), sidestep & swing to finish (8+8)", "40 bars"]], "totalBars": "Body repeated between each Figure; Sides then perform each Figure after Tops", "notes": "Equal distance should be kept between couples during the Lead Around.", "isHandDance": true}, {"num": 21, "irish": "Cor Muirgheis", "english": "Morris Reel", "type": "Eight-hand (Lead Around, Body, 2 Figures, Finish)", "time": "Reel time", "dancers": "Four couples", "formation": "As Eight Hand Reel", "movements": [["Note", "", "All movements are the same as Eight Hand Reel, except the first and second Body movements differ", "—"]], "totalBars": "See Eight Hand Reel for shared structure", "notes": "Nearly identical to Eight Hand Reel — only the first two Body movements are unique to this dance.", "isHandDance": true}, {"num": 22, "irish": "An Cor Casta", "english": "Cross Reel", "type": "Eight-hand (Lead Around, Body, 2 Figures, Finish)", "time": "Reel/general time", "dancers": "Four couples", "formation": "As Eight Hand Reel", "movements": [["Note", "", "A number of movements in this dance appear in other dances; note the differences and similarities", "—"]], "totalBars": "Standard Eight-Hand structure (Lead Around, Body, 2 Figures, Finish)", "notes": "Shares figures with several other eight-hand dances.", "isHandDance": true}, {"num": 23, "irish": "An Port Ochtar", "english": "Eight Hand Jig", "type": "Eight-hand (Lead Around, Body, 2 Figures, Finish)", "time": "Jig time", "dancers": "Four couples", "formation": "As Eight Hand Reel", "movements": [["Note", "", "Structure follows the standard Eight-Hand format: Lead Around, Body, two Figures, Finish", "—"]], "totalBars": "Standard Eight-Hand structure", "notes": "Jig-time counterpart to Eight Hand Reel.", "isHandDance": true}, {"num": 24, "irish": "Lá Fhéile Phádraig", "english": "St. Patrick's Day", "type": "Eight-hand (Lead Around, Body, 2 Figures, Finish)", "time": "Jig time — danced to the tune of the same name", "dancers": "Four couples", "formation": "As Eight Hand Reel", "movements": [["Note", "", "1st part of tune is 8 bars, 2nd part is 14 bars; each part played twice after an 8-bar introduction", "—"]], "totalBars": "Standard Eight-Hand structure, fitted to the tune's 8+14 bar parts", "notes": "Movements shared with other dances — note the differences and similarities.", "isHandDance": true}, {"num": 25, "irish": "Turas 'un Tí", "english": "Trip to the Cottage", "type": "Eight-hand", "time": "Jig time — danced to the tune of the same name", "dancers": "Four couples", "formation": "As Eight Hand Reel", "movements": [["Note", "", "Standard eight-hand jig structure", "—"]], "totalBars": "Standard Eight-Hand structure", "notes": "Originated in Co. Armagh.", "isHandDance": true}, {"num": 26, "irish": "Cadhp an Chúil Áird", "english": "High Cauled Cap", "type": "Eight-hand (Lead Around, Body, 3 Figures, Finish)", "time": "Reel time — traditionally to the tune of the same name", "dancers": "Four couples", "formation": "As Eight Hand Reel", "movements": [["Lead Around", "Gabháil Timpeall", "Circle anti-clockwise (8), circle clockwise back (8)", "16 bars"], ["Note", "", "Body, Three Figures and Finish follow — three figures rather than the usual two", "—"]], "totalBars": "Body + 3 Figures + Finish (longer than the standard 2-figure eight-hands)", "notes": "Originated in Co. Kerry.", "isHandDance": true}, {"num": 27, "irish": "Aoibhneas na Bealtaine", "english": "Sweets of May", "type": "Eight-hand (Opening, Body, 3 Figures, Finish)", "time": "Single jig time — danced to the tune of the same name", "dancers": "Four couples", "formation": "As Eight Hand Reel", "movements": [["Note", "", "Both ordinary and skip threes acceptable but not to be mixed; Opening movement, Body, Three Figures, Finish", "—"]], "totalBars": "Opening + Body + 3 Figures + Finish", "notes": "Originated in Co. Armagh.", "isHandDance": true}, {"num": 28, "irish": "Na Trí Fionn", "english": "The Three Tunes", "type": "Eight-hand", "time": "Three different tunes: Haste to the Wedding (Jig), Leslie's Hornpipe, The German Beau (Reel) — reel slower than jig, hornpipe slowest", "dancers": "Four couples", "formation": "Ring, all holding hands", "movements": [["1. Ring", "Céim an Fháinne", "Sidestep clockwise finishing two threes (4), back (4); anti-clockwise repeat", "8+ bars — danced to Haste to the Wedding"]], "totalBars": "Multiple movements across the three tunes", "notes": "Originated in Co. Armagh. Each tune's tempo differs — reel slower than jig, hornpipe slowest of all.", "isHandDance": true}, {"num": 29, "irish": "Geataí Dhoire", "english": "Gates of Derry", "type": "Eight-hand", "time": "Single Jig time", "dancers": "Four couples", "formation": "Two lines, partners facing (favourite tune: The Quaker's Wife)", "movements": [["Note", "", "Ordinary simple threes must be performed throughout — skip threes not permitted at competition/feiseanna", "—"]], "totalBars": "Standard eight-hand structure", "notes": "Originated in Co. Derry. Favourite tune: The Quaker's Wife.", "isHandDance": true}, {"num": 30, "irish": "Cor Seisear Déag", "english": "Sixteen Hand Reel", "type": "Sixteen-hand (Lead Around, Body, 3 Figures, Finish)", "time": "Reel time", "dancers": "Eight couples (Tops 1&2, Sides 3&4, Second Tops 5&6, Second Sides 7&8)", "formation": "Large square/diamond set of 8 couples", "movements": [["Lead Around", "Gabháil Timpeall", "As Eight Hand Reel", "16 bars"], ["Body 1: Sides", "Na Cliatháin", "Change places, gents behind (4), back gents in front (4)", "8 bars"], ["Body 2: Hands Around", "Fáinne", "Couples 1-4 ring with couple on right, sidestep clockwise (4), anti-clockwise & release (4)", "8 bars"], ["Body 3: Sides (repeat)", "Na Cliatháin", "As movement 1", "8 bars"], ["Body 4: Hands Around (left)", "Fáinne", "Couples 1-4 ring with couple on left, sidestep clockwise (4), anti-clockwise & release (4)", "8 bars"], ["Body 5: Half Chain", "Slabhra Leath Slí", "Gents anti-clockwise, ladies clockwise, chain to meet partner (12), lead around back to place (4)", "16 bars"], ["Body 6: Link Arms", "Uillinn in Uillinn", "Gents 1-4 link right arm & circle (4); hand-turns with ladies left/right (4); swing with couple on left (8)", "16 bars"], ["Figure 1: Advance and Retire", "An Chéad Fhigiúr", "As Eight Hand Reel, performed by couples 1&2, 3&4, 5&6, 7&8 in turn", "16 bars"], ["Figure 2: Right Hand to Opposite Lady", "An Dara Figiúr / Deas Lámha Anonn", "Gents exchange hand-turns with opposite lady and partner (2+2+2+2), link arms in centre (3+3), return & swing (2+8)", "24 bars"], ["Figure 3: Arch Arms", "An Triú Figiúr / Lámha in Airde", "Couples swing across (4), form arch to exchange ladies/gents (4), swing across again (4), form arch other way (4), swing to place (8)", "24 bars"], ["Finish", "An Deireadh", "As Eight Hand Reel", "40 bars"]], "totalBars": "Body repeated between each Figure; each Figure performed by all four couple-pairs in turn", "notes": "The most elaborate céilí dance in the collection — for eight couples in a square/diamond formation.", "isHandDance": true}];</script>
+<script>
+  let deck = DANCES.slice();
+  let index = 0;
+  let flipped = false;
+
+
+  const cardEl = document.getElementById('card');
+  const cardNum = document.getElementById('cardNum');
+  const irishName = document.getElementById('irishName');
+  const englishName = document.getElementById('englishName');
+  const backContent = document.getElementById('backContent');
+  const curIdx = document.getElementById('curIdx');
+  const totIdx = document.getElementById('totIdx');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, m => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+    }[m]));
+  }
+
+  function renderBack(d){
+    let html = '';
+    html += `<div class="back-header">
+      <div class="en">${escapeHtml(d.english)}</div>
+      <div class="ir">${escapeHtml(d.irish)}</div>
+    </div>`;
+
+    html += `<div class="meta-grid">
+      <div class="meta-item"><span class="k">TYPE</span><span class="v">${escapeHtml(d.type)}</span></div>
+      <div class="meta-item"><span class="k">MUSIC</span><span class="v">${escapeHtml(d.time)}</span></div>
+      <div class="meta-item full"><span class="k">DANCERS</span><span class="v">${escapeHtml(d.dancers)}</span></div>
+    </div>`;
+
+    html += `<div class="movements-label">MOVEMENTS &amp; BARS</div>`;
+    d.movements.forEach(m => {
+      const [title, irish, desc, bars] = m;
+      html += `<div class="movement movement-concise">
+        <div class="movement-head">
+          <div class="movement-title">${escapeHtml(title)}</div>
+          <div class="movement-bars">${escapeHtml(bars)}</div>
+        </div>
+      </div>`;
+    });
+
+    html += `<div class="total-bars">Total: ${escapeHtml(String(d.totalBars))}</div>`;
+    return html;
+  }
+
+  function render(){
+    const d = deck[index];
+    cardNum.textContent = `DANCE No. ${d.num}`;
+    irishName.textContent = d.irish;
+    englishName.textContent = d.english;
+    backContent.innerHTML = renderBack(d);
+    curIdx.textContent = index + 1;
+    totIdx.textContent = deck.length;
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === deck.length - 1;
+    if(flipped){
+      cardEl.classList.remove('flipped');
+      flipped = false;
+    }
+    backContent.scrollTop = 0;
+  }
+
+  function go(delta){
+    const newIndex = index + delta;
+    if(newIndex < 0 || newIndex >= deck.length) return;
+    index = newIndex;
+    render();
+  }
+
+  cardEl.addEventListener('click', () => {
+    flipped = !flipped;
+    cardEl.classList.toggle('flipped', flipped);
+  });
+
+  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); go(-1); });
+  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); go(1); });
+
+  shuffleBtn.addEventListener('click', () => {
+    for(let i = deck.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    index = 0;
+    render();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowRight') go(1);
+    if(e.key === 'ArrowLeft') go(-1);
+    if(e.key === ' '){ e.preventDefault(); cardEl.click(); }
+  });
+
+  render();
+</script>
+</body>
+</html>
